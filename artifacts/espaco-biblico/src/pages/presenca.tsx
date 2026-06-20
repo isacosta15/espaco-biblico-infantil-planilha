@@ -3,10 +3,13 @@ import { format } from "date-fns";
 import { 
   useListChildren, 
   useMarkAttendance,
+  useUnmarkAttendance,
+  getListChildrenQueryKey,
   Child
 } from "@workspace/api-client-react";
-import { Search, CheckCircle2, UserPlus } from "lucide-react";
+import { Search, CheckCircle2, UserPlus, X } from "lucide-react";
 import { Link } from "wouter";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -29,38 +32,49 @@ export default function PresencaPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 300);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const { data: children, isLoading, refetch } = useListChildren({
-    query: {
-      queryKey: ['/api/children', { search: debouncedSearch }]
-    }
-  });
+  const { data: children, isLoading, refetch } = useListChildren(
+    debouncedSearch ? { search: debouncedSearch } : {}
+  );
 
   const markAttendance = useMarkAttendance();
+  const unmarkAttendance = useUnmarkAttendance();
 
   const handleMarkAttendance = (child: Child) => {
     if (child.presentToday) return;
-
     markAttendance.mutate(
       { data: { childId: child.id, attendanceDate: format(new Date(), "yyyy-MM-dd") } },
       {
         onSuccess: () => {
-          toast({
-            title: "Presença registrada",
-            description: `${child.fullName} marcado(a) como presente.`,
-          });
-          refetch(); // Fast refetch to update the list
+          toast({ title: "Presença registrada", description: `${child.fullName} marcado(a) como presente.` });
+          refetch();
+          queryClient.invalidateQueries({ queryKey: getListChildrenQueryKey() });
         },
         onError: () => {
-          toast({
-            variant: "destructive",
-            title: "Erro",
-            description: "Não foi possível registrar a presença.",
-          });
+          toast({ variant: "destructive", title: "Erro", description: "Não foi possível registrar a presença." });
         }
       }
     );
   };
+
+  const handleUnmarkAttendance = (child: Child) => {
+    unmarkAttendance.mutate(
+      { childId: child.id },
+      {
+        onSuccess: () => {
+          toast({ title: "Presença removida", description: `Presença de ${child.fullName} foi desfeita.` });
+          refetch();
+          queryClient.invalidateQueries({ queryKey: getListChildrenQueryKey() });
+        },
+        onError: () => {
+          toast({ variant: "destructive", title: "Erro", description: "Não foi possível desfazer a presença." });
+        }
+      }
+    );
+  };
+
+  const isPending = markAttendance.isPending || unmarkAttendance.isPending;
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
@@ -87,28 +101,43 @@ export default function PresencaPage() {
           Array(4).fill(0).map((_, i) => <Skeleton key={i} className="h-28 w-full rounded-xl" />)
         ) : children && children.length > 0 ? (
           children.map((child) => (
-            <ChildCard 
-              key={child.id} 
-              child={child} 
+            <ChildCard
+              key={child.id}
+              child={child}
               action={
-                <Button 
-                  size="lg"
-                  variant={child.presentToday ? "outline" : "default"}
-                  className={`w-32 h-14 ${child.presentToday ? "bg-green-50 text-green-700 border-green-200" : ""}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleMarkAttendance(child);
-                  }}
-                  disabled={child.presentToday || markAttendance.isPending}
-                >
-                  {child.presentToday ? (
-                    <>
-                      <CheckCircle2 className="w-5 h-5 mr-2" />
+                child.presentToday ? (
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="flex items-center gap-1 text-green-700 font-medium text-sm">
+                      <CheckCircle2 className="w-4 h-4" />
                       Presente
-                    </>
-                  ) : "Marcar"}
-                </Button>
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleUnmarkAttendance(child);
+                      }}
+                      disabled={isPending}
+                      className="text-xs text-red-500 hover:text-red-700 hover:underline flex items-center gap-1 disabled:opacity-50"
+                    >
+                      <X className="w-3 h-3" />
+                      Desfazer
+                    </button>
+                  </div>
+                ) : (
+                  <Button
+                    size="lg"
+                    className="w-32 h-14"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleMarkAttendance(child);
+                    }}
+                    disabled={isPending}
+                  >
+                    Marcar
+                  </Button>
+                )
               }
             />
           ))

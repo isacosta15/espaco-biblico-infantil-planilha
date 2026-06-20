@@ -408,6 +408,14 @@ export const MarkAttendanceBody = zod.object({
 
 
 /**
+ * @summary Remove today's attendance for a child
+ */
+export const UnmarkAttendanceParams = zod.object({
+  "childId": zod.coerce.number()
+})
+
+
+/**
  * @summary List all dates that have attendance records
  */
 export const ListAttendanceDatesResponseItem = zod.object({

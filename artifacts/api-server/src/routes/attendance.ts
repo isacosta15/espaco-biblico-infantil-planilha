@@ -80,6 +80,25 @@ router.get("/attendance", authMiddleware, async (req, res): Promise<void> => {
   res.json(enriched);
 });
 
+router.delete("/attendance/today/:childId", authMiddleware, async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.childId) ? req.params.childId[0] : req.params.childId;
+  const childId = parseInt(raw, 10);
+  if (isNaN(childId)) {
+    res.status(400).json({ error: "ID inválido" });
+    return;
+  }
+  const todayStr = getTodayStr();
+  const [deleted] = await db.delete(attendanceTable)
+    .where(and(eq(attendanceTable.childId, childId), eq(attendanceTable.attendanceDate, todayStr)))
+    .returning();
+  if (!deleted) {
+    res.status(404).json({ error: "Presença não encontrada para hoje" });
+    return;
+  }
+  await updateDailyReport(todayStr);
+  res.sendStatus(204);
+});
+
 router.post("/attendance", authMiddleware, async (req, res): Promise<void> => {
   const parsed = MarkAttendanceBody.safeParse(req.body);
   if (!parsed.success) {

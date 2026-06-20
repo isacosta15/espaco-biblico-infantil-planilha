@@ -407,6 +407,23 @@ paths:
         "409":
           description: Already marked today
 
+  /attendance/today/{childId}:
+    delete:
+      operationId: unmarkAttendance
+      tags: [attendance]
+      summary: Remove today's attendance for a child
+      parameters:
+        - name: childId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Attendance removed
+        "404":
+          description: Not found
+
   /attendance/dates:
     get:
       operationId: listAttendanceDates

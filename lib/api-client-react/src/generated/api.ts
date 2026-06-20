@@ -1492,6 +1492,76 @@ export const useMarkAttendance = <TError = ErrorType<void>,
       return useMutation(getMarkAttendanceMutationOptions(options));
     }
 
+export const getUnmarkAttendanceUrl = (childId: number,) => {
+
+
+
+
+  return `/api/attendance/today/${childId}`
+}
+
+/**
+ * @summary Remove today's attendance for a child
+ */
+export const unmarkAttendance = async (childId: number, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getUnmarkAttendanceUrl(childId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getUnmarkAttendanceMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unmarkAttendance>>, TError,{childId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof unmarkAttendance>>, TError,{childId: number}, TContext> => {
+
+const mutationKey = ['unmarkAttendance'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof unmarkAttendance>>, {childId: number}> = (props) => {
+          const {childId} = props ?? {};
+
+          return  unmarkAttendance(childId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UnmarkAttendanceMutationResult = NonNullable<Awaited<ReturnType<typeof unmarkAttendance>>>
+
+    export type UnmarkAttendanceMutationError = ErrorType<void>
+
+    /**
+ * @summary Remove today's attendance for a child
+ */
+export const useUnmarkAttendance = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unmarkAttendance>>, TError,{childId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof unmarkAttendance>>,
+        TError,
+        {childId: number},
+        TContext
+      > => {
+      return useMutation(getUnmarkAttendanceMutationOptions(options));
+    }
+
 export const getListAttendanceDatesUrl = () => {
 
 
