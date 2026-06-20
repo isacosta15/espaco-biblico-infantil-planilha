@@ -6,12 +6,13 @@ import {
   LayoutDashboard, 
   CheckSquare, 
   Users, 
-  Church, 
+  Building2, 
   History, 
   BarChart3, 
   LogOut,
   Menu,
-  X
+  X,
+  BookOpen
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -19,7 +20,7 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/presenca", label: "Presença", icon: CheckSquare },
   { href: "/criancas", label: "Crianças", icon: Users },
-  { href: "/congregacoes", label: "Congregações", icon: Church },
+  { href: "/congregacoes", label: "Congregações", icon: Building2 },
   { href: "/historico", label: "Histórico", icon: History },
   { href: "/relatorios", label: "Relatórios", icon: BarChart3 },
 ];
@@ -60,7 +61,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Mobile Header */}
       <div className="md:hidden flex items-center justify-between p-4 bg-white border-b sticky top-0 z-20">
         <div className="flex items-center gap-2 text-primary font-bold text-lg">
-          <Church className="w-6 h-6" />
+          <BookOpen className="w-6 h-6" />
           <span>EBI Check-in</span>
         </div>
         <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
@@ -77,7 +78,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="h-full flex flex-col">
           <div className="p-6 hidden md:flex items-center gap-3 text-primary font-bold text-xl">
             <div className="bg-primary/10 p-2 rounded-xl text-primary">
-              <Church className="w-6 h-6" />
+              <BookOpen className="w-6 h-6" />
             </div>
             <span>EBI</span>
           </div>

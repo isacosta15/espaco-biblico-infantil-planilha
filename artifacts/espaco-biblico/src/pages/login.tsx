@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useLogin } from "@workspace/api-client-react";
 import { setToken } from "@/lib/auth";
-import { Church } from "lucide-react";
+import { BookOpen } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -67,7 +67,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-8 text-primary">
           <div className="bg-primary/10 p-4 rounded-full mb-4">
-            <Church className="w-12 h-12" />
+            <BookOpen className="w-12 h-12" />
           </div>
           <h1 className="text-3xl font-bold text-foreground">Espaço Bíblico</h1>
           <p className="text-muted-foreground mt-1">Check-in Infantil</p>
