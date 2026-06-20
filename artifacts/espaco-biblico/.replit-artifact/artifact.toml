@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Espaço Bíblico Infantil"
+version = "1.0.0"
+id = "artifacts/espaco-biblico"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22558
+
+[services.development]
+run = "pnpm --filter @workspace/espaco-biblico run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/espaco-biblico", "run", "build" ]
+publicDir = "artifacts/espaco-biblico/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22558"
+BASE_PATH = "/"

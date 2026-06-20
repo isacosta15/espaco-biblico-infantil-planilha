@@ -1,0 +1,489 @@
+Crie uma plataforma web completa chamada “Espaço Bíblico Infantil”.
+
+OBJETIVO:
+A plataforma será utilizada no departamento infantil da igreja para:
+- cadastrar crianças,
+- controlar presença,
+- acompanhar frequência,
+- visualizar relatórios por data,
+- gerar estatísticas automáticas,
+- e funcionar totalmente OFFLINE também.
+
+========================================
+REQUISITO MAIS IMPORTANTE
+========================================
+
+A plataforma PRECISA funcionar sem internet/Wi-Fi.
+
+Ela deve funcionar como PWA (Progressive Web App), permitindo:
+
+- funcionamento offline,
+- cache automático,
+- armazenamento local,
+- sincronização futura quando internet voltar.
+
+Mesmo offline deve ser possível:
+- pesquisar crianças,
+- cadastrar crianças,
+- marcar presença,
+- visualizar histórico,
+- visualizar dashboard,
+- acessar relatórios anteriores.
+
+Utilizar:
+- Service Worker
+- IndexedDB
+- Cache inteligente
+- Sincronização automática
+
+========================================
+TECNOLOGIAS
+========================================
+
+Frontend:
+- React.js
+- Vite
+- Tailwind CSS
+
+Backend:
+- Node.js
+- Express
+
+Banco:
+- MySQL
+
+ORM:
+- Prisma ORM
+
+Offline:
+- PWA
+- IndexedDB
+- Service Worker
+
+Outros:
+- JWT Authentication
+- bcrypt
+- React Router
+- Zustand ou Context API
+- Chart.js
+
+========================================
+VISUAL
+========================================
+
+A plataforma deve possuir:
+- visual moderno,
+- infantil discreto,
+- organizado,
+- rápido,
+- acolhedor.
+
+Usar:
+- cards,
+- sombras suaves,
+- bordas arredondadas,
+- ícones intuitivos,
+- dashboard moderno,
+- cores suaves:
+  - azul claro,
+  - amarelo suave,
+  - verde claro.
+
+A interface deve funcionar perfeitamente:
+- em celular,
+- tablet,
+- computador.
+
+========================================
+MÓDULOS PRINCIPAIS
+========================================
+
+1. LOGIN
+2. CADASTRO DE COMUNS
+3. CADASTRO DE CRIANÇAS
+4. PRESENÇA
+5. HISTÓRICO DE PRESENÇA
+6. RELATÓRIOS
+7. DASHBOARD
+8. FUNCIONAMENTO OFFLINE
+
+========================================
+1. LOGIN
+========================================
+
+Criar sistema de login com:
+- email,
+- senha,
+- JWT,
+- persistência de login,
+- autenticação segura,
+- bcrypt.
+
+Tipos de usuários:
+- administrador
+- auxiliar
+
+========================================
+2. CADASTRO DE COMUNS / CONGREGAÇÕES
+========================================
+
+Criar módulo para cadastrar comuns/congregações.
+
+Campos:
+- Nome da comum
+- Email
+- Telefone
+- Endereço
+- Cidade
+- Estado
+- Nome do responsável
+
+Cada comum poderá possuir:
+- várias crianças
+- vários usuários
+
+========================================
+3. CADASTRO DE CRIANÇAS
+========================================
+
+Campos obrigatórios:
+- Nome completo
+- Data de nascimento
+- Sexo (Menino/Menina)
+- Nome do responsável
+- Telefone do responsável
+- Comum/congregação
+
+Campos opcionais:
+- Restrição alimentar
+- Descrição da restrição
+- Possui TEA/autismo
+- Observações
+
+REGRAS:
+- A idade NÃO deve ser salva no banco.
+- A idade deve ser calculada automaticamente usando a data de nascimento.
+- A idade deve atualizar automaticamente com o tempo.
+
+CRIANÇAS COM 12 ANOS OU MAIS:
+Destacar visualmente:
+- borda amarela
+- badge “⚠️ 12+”
+- ou ícone especial.
+
+========================================
+4. SISTEMA DE PRESENÇA
+========================================
+
+IMPORTANTE:
+NÃO criar lista de chamada tradicional.
+
+FUNCIONAMENTO:
+- Deve existir uma tela de presença dinâmica.
+- O usuário pesquisa uma criança pelo nome.
+- A pesquisa deve ser instantânea.
+
+Exemplo:
+
+Pesquisar:
+“Ana”
+
+Resultados:
+- Ana Clara
+- Ana Júlia
+
+Cada resultado deve possuir:
+[Marcar presença]
+
+Ao clicar:
+- salvar presença automaticamente,
+- salvar data,
+- salvar horário,
+- mudar botão para verde,
+- impedir presença duplicada no mesmo dia.
+
+========================================
+5. CRIANÇA NÃO ENCONTRADA
+========================================
+
+Se a criança pesquisada não existir:
+
+Mostrar:
+“Nenhuma criança encontrada”
+
+E exibir botão:
+➕ Adicionar nova criança
+
+Ao clicar:
+Abrir modal de cadastro rápido.
+
+========================================
+6. CADASTRO RÁPIDO
+========================================
+
+Campos:
+- Nome
+- Sexo
+- Data nascimento
+- Responsável
+- Telefone
+
+Salvar automaticamente e já permitir marcar presença.
+
+========================================
+7. HISTÓRICO POR DATA
+========================================
+
+IMPORTANTE:
+A plataforma deve salvar e permitir visualizar presença por DATA.
+
+Exemplo:
+
+16/05/2026
+- Meninas: 15
+- Meninos: 10
+- Total: 25
+
+09/05/2026
+- Meninas: 18
+- Meninos: 12
+- Total: 30
+
+O usuário deve conseguir abrir qualquer data anterior.
+
+Exemplo:
+“Sábado passado”
+
+E visualizar:
+- total de meninas,
+- total de meninos,
+- total geral,
+- lista de presentes daquele dia.
+
+========================================
+8. RELATÓRIOS DIÁRIOS
+========================================
+
+Criar sistema automático de relatório diário.
+
+Toda vez que marcar presença:
+- atualizar automaticamente os totais do dia.
+
+Salvar:
+- quantidade de meninas,
+- quantidade de meninos,
+- total geral.
+
+Criar tabela específica para:
+daily_reports
+
+Campos:
+- date
+- total_girls
+- total_boys
+- total_children
+
+========================================
+9. DASHBOARD
+========================================
+
+Mostrar:
+- Total geral de crianças
+- Quantidade de meninas
+- Quantidade de meninos
+- Presentes hoje
+- Ausentes hoje
+- Crianças com mais faltas
+- Média semanal
+- Gráfico de presença
+- Histórico por data
+- Aniversariantes do mês
+
+========================================
+10. CONTROLE DE FREQUÊNCIA
+========================================
+
+Calcular automaticamente:
+- quantidade de presenças,
+- quantidade de faltas,
+- porcentagem de frequência,
+- última presença.
+
+Criar área:
+“Crianças que mais faltam”
+
+Mostrar:
+- nome,
+- quantidade de faltas,
+- última presença.
+
+========================================
+11. PERFIL DA CRIANÇA
+========================================
+
+Ao clicar na criança mostrar:
+- dados completos,
+- idade automática,
+- histórico de presença,
+- frequência,
+- telefone,
+- congregação,
+- restrições,
+- TEA/autismo.
+
+========================================
+12. FILTROS
+========================================
+
+Permitir filtrar:
+- meninas,
+- meninos,
+- presentes hoje,
+- faltosos,
+- TEA/autismo,
+- restrição alimentar,
+- congregação,
+- crianças 12+.
+
+========================================
+13. EXPORTAÇÃO
+========================================
+
+Permitir exportar:
+- PDF
+- Excel
+
+Relatórios:
+- presença por data,
+- frequência,
+- lista de crianças,
+- faltosos.
+
+========================================
+14. WHATSAPP
+========================================
+
+Adicionar botão rápido para:
+- abrir WhatsApp do responsável.
+
+========================================
+15. BANCO DE DADOS
+========================================
+
+Criar tabelas:
+
+users
+- id
+- name
+- email
+- password
+- role
+- congregation_id
+
+congregations
+- id
+- name
+- email
+- phone
+- address
+- city
+- state
+- responsible_name
+
+children
+- id
+- full_name
+- birth_date
+- gender
+- guardian_name
+- guardian_phone
+- food_restriction
+- food_restriction_description
+- autism
+- observations
+- congregation_id
+
+attendance
+- id
+- child_id
+- attendance_date
+- attendance_time
+
+daily_reports
+- id
+- report_date
+- total_girls
+- total_boys
+- total_children
+
+Criar todos os relacionamentos corretamente.
+
+========================================
+16. ESTRUTURA DO PROJETO
+========================================
+
+Frontend:
+src/
+- pages
+- components
+- services
+- hooks
+- contexts
+- offline
+- utils
+- routes
+
+Backend:
+src/
+- controllers
+- routes
+- middlewares
+- services
+- prisma
+- utils
+
+========================================
+17. SEGURANÇA
+========================================
+
+Implementar:
+- JWT
+- bcrypt
+- middleware auth
+- validação de dados
+- tratamento de erros
+- proteção de rotas
+
+========================================
+18. EXPERIÊNCIA DO USUÁRIO
+========================================
+
+O sistema deve ser:
+- extremamente rápido,
+- fácil de usar,
+- com poucos cliques,
+- intuitivo,
+- ideal para uso durante entrada das crianças.
+
+========================================
+19. ENTREGA FINAL
+========================================
+
+Entregar:
+- frontend completo,
+- backend completo,
+- banco configurado,
+- Prisma configurado,
+- PWA funcional,
+- funcionamento offline,
+- dashboard,
+- gráficos,
+- sistema de presença funcional,
+- histórico por data funcional,
+- autenticação completa,
+- README explicando instalação,
+- scripts de execução,
+- estrutura pronta para produção.
+
+NOME DA PLATAFORMA:
+Espaço Bíblico Infantil

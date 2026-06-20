@@ -1,22 +1,30 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Espaço Bíblico Infantil API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication
+  - name: congregations
+    description: Congregation management
+  - name: children
+    description: Children management
+  - name: attendance
+    description: Attendance management
+  - name: reports
+    description: Reports and statistics
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +32,822 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login with email and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+
+  /congregations:
+    get:
+      operationId: listCongregations
+      tags: [congregations]
+      summary: List all congregations
+      responses:
+        "200":
+          description: List of congregations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Congregation"
+    post:
+      operationId: createCongregation
+      tags: [congregations]
+      summary: Create a congregation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CongregationInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Congregation"
+
+  /congregations/{id}:
+    get:
+      operationId: getCongregation
+      tags: [congregations]
+      summary: Get congregation by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Congregation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Congregation"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateCongregation
+      tags: [congregations]
+      summary: Update congregation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CongregationUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Congregation"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteCongregation
+      tags: [congregations]
+      summary: Delete congregation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
+  /children:
+    get:
+      operationId: listChildren
+      tags: [children]
+      summary: List children with optional filters
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search by name
+        - name: gender
+          in: query
+          schema:
+            type: string
+            enum: [M, F]
+        - name: congregationId
+          in: query
+          schema:
+            type: integer
+        - name: autism
+          in: query
+          schema:
+            type: boolean
+        - name: foodRestriction
+          in: query
+          schema:
+            type: boolean
+        - name: ageAbove12
+          in: query
+          schema:
+            type: boolean
+        - name: presentToday
+          in: query
+          schema:
+            type: boolean
+        - name: absentToday
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of children
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Child"
+    post:
+      operationId: createChild
+      tags: [children]
+      summary: Create a child record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChildInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Child"
+
+  /children/birthdays:
+    get:
+      operationId: getBirthdaysThisMonth
+      tags: [children]
+      summary: Get children with birthdays this month
+      responses:
+        "200":
+          description: Birthday children
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Child"
+
+  /children/most-absent:
+    get:
+      operationId: getMostAbsentChildren
+      tags: [children]
+      summary: Get children with most absences
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Children with most absences
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChildWithFrequency"
+
+  /children/{id}:
+    get:
+      operationId: getChild
+      tags: [children]
+      summary: Get child by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Child
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Child"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateChild
+      tags: [children]
+      summary: Update child record
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChildUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Child"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteChild
+      tags: [children]
+      summary: Delete child record
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
+  /children/{id}/frequency:
+    get:
+      operationId: getChildFrequency
+      tags: [children]
+      summary: Get frequency stats for a child
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Frequency stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChildFrequency"
+
+  /children/{id}/attendance:
+    get:
+      operationId: getChildAttendance
+      tags: [children]
+      summary: Get attendance history for a child
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Attendance history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Attendance"
+
+  /attendance:
+    get:
+      operationId: listAttendance
+      tags: [attendance]
+      summary: List attendance records, optionally by date
+      parameters:
+        - name: date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Filter by date (YYYY-MM-DD)
+      responses:
+        "200":
+          description: Attendance records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AttendanceWithChild"
+    post:
+      operationId: markAttendance
+      tags: [attendance]
+      summary: Mark attendance for a child
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AttendanceInput"
+      responses:
+        "201":
+          description: Attendance marked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Attendance"
+        "409":
+          description: Already marked today
+
+  /attendance/dates:
+    get:
+      operationId: listAttendanceDates
+      tags: [attendance]
+      summary: List all dates that have attendance records
+      responses:
+        "200":
+          description: List of dates with summaries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DailyReport"
+
+  /reports/daily:
+    get:
+      operationId: listDailyReports
+      tags: [reports]
+      summary: List daily reports
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Daily reports
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DailyReport"
+
+  /reports/daily/{date}:
+    get:
+      operationId: getDailyReport
+      tags: [reports]
+      summary: Get daily report for a specific date
+      parameters:
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Daily report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DailyReport"
+        "404":
+          description: Not found
+
+  /dashboard/stats:
+    get:
+      operationId: getDashboardStats
+      tags: [reports]
+      summary: Get dashboard statistics
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /dashboard/weekly:
+    get:
+      operationId: getWeeklyStats
+      tags: [reports]
+      summary: Get weekly attendance trend (last 8 weeks)
+      responses:
+        "200":
+          description: Weekly stats
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WeeklyStat"
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
 
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 1
+
+    AuthResponse:
+      type: object
+      required: [token, user]
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+
+    User:
+      type: object
+      required: [id, name, email, role]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [admin, auxiliary]
+        congregationId:
+          type: ["integer", "null"]
+
+    Congregation:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        city:
+          type: ["string", "null"]
+        state:
+          type: ["string", "null"]
+        responsibleName:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+
+    CongregationInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        responsibleName:
+          type: string
+
+    CongregationUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        responsibleName:
+          type: string
+
+    Child:
+      type: object
+      required: [id, fullName, birthDate, gender, guardianName, guardianPhone]
+      properties:
+        id:
+          type: integer
+        fullName:
+          type: string
+        birthDate:
+          type: string
+          format: date
+        gender:
+          type: string
+          enum: [M, F]
+        guardianName:
+          type: string
+        guardianPhone:
+          type: string
+        foodRestriction:
+          type: boolean
+        foodRestrictionDescription:
+          type: ["string", "null"]
+        autism:
+          type: boolean
+        observations:
+          type: ["string", "null"]
+        congregationId:
+          type: ["integer", "null"]
+        congregationName:
+          type: ["string", "null"]
+        age:
+          type: integer
+        presentToday:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    ChildInput:
+      type: object
+      required: [fullName, birthDate, gender, guardianName, guardianPhone]
+      properties:
+        fullName:
+          type: string
+          minLength: 1
+        birthDate:
+          type: string
+          format: date
+        gender:
+          type: string
+          enum: [M, F]
+        guardianName:
+          type: string
+          minLength: 1
+        guardianPhone:
+          type: string
+          minLength: 1
+        foodRestriction:
+          type: boolean
+        foodRestrictionDescription:
+          type: string
+        autism:
+          type: boolean
+        observations:
+          type: string
+        congregationId:
+          type: integer
+
+    ChildUpdate:
+      type: object
+      properties:
+        fullName:
+          type: string
+          minLength: 1
+        birthDate:
+          type: string
+          format: date
+        gender:
+          type: string
+          enum: [M, F]
+        guardianName:
+          type: string
+        guardianPhone:
+          type: string
+        foodRestriction:
+          type: boolean
+        foodRestrictionDescription:
+          type: string
+        autism:
+          type: boolean
+        observations:
+          type: string
+        congregationId:
+          type: integer
+
+    ChildWithFrequency:
+      type: object
+      required: [id, fullName, birthDate, gender, guardianName, guardianPhone, absenceCount]
+      properties:
+        id:
+          type: integer
+        fullName:
+          type: string
+        birthDate:
+          type: string
+          format: date
+        gender:
+          type: string
+          enum: [M, F]
+        guardianName:
+          type: string
+        guardianPhone:
+          type: string
+        foodRestriction:
+          type: boolean
+        foodRestrictionDescription:
+          type: ["string", "null"]
+        autism:
+          type: boolean
+        observations:
+          type: ["string", "null"]
+        congregationId:
+          type: ["integer", "null"]
+        congregationName:
+          type: ["string", "null"]
+        age:
+          type: integer
+        presentToday:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        absenceCount:
+          type: integer
+        presenceCount:
+          type: integer
+        lastPresence:
+          type: ["string", "null"]
+
+    ChildFrequency:
+      type: object
+      required: [childId, presenceCount, absenceCount, frequencyPercent]
+      properties:
+        childId:
+          type: integer
+        presenceCount:
+          type: integer
+        absenceCount:
+          type: integer
+        frequencyPercent:
+          type: number
+        lastPresence:
+          type: ["string", "null"]
+
+    Attendance:
+      type: object
+      required: [id, childId, attendanceDate, attendanceTime]
+      properties:
+        id:
+          type: integer
+        childId:
+          type: integer
+        attendanceDate:
+          type: string
+          format: date
+        attendanceTime:
+          type: string
+
+    AttendanceInput:
+      type: object
+      required: [childId]
+      properties:
+        childId:
+          type: integer
+        attendanceDate:
+          type: string
+          format: date
+
+    AttendanceWithChild:
+      type: object
+      required: [id, childId, attendanceDate, attendanceTime, child]
+      properties:
+        id:
+          type: integer
+        childId:
+          type: integer
+        attendanceDate:
+          type: string
+          format: date
+        attendanceTime:
+          type: string
+        child:
+          $ref: "#/components/schemas/Child"
+
+    DailyReport:
+      type: object
+      required: [reportDate, totalGirls, totalBoys, totalChildren]
+      properties:
+        id:
+          type: ["integer", "null"]
+        reportDate:
+          type: string
+          format: date
+        totalGirls:
+          type: integer
+        totalBoys:
+          type: integer
+        totalChildren:
+          type: integer
+
+    DashboardStats:
+      type: object
+      required: [totalChildren, totalGirls, totalBoys, presentToday, absentToday, todayGirls, todayBoys]
+      properties:
+        totalChildren:
+          type: integer
+        totalGirls:
+          type: integer
+        totalBoys:
+          type: integer
+        presentToday:
+          type: integer
+        absentToday:
+          type: integer
+        todayGirls:
+          type: integer
+        todayBoys:
+          type: integer
+        weeklyAverage:
+          type: number
+
+    WeeklyStat:
+      type: object
+      required: [weekLabel, totalChildren, totalGirls, totalBoys]
+      properties:
+        weekLabel:
+          type: string
+        reportDate:
+          type: string
+        totalChildren:
+          type: integer
+        totalGirls:
+          type: integer
+        totalBoys:
+          type: integer
