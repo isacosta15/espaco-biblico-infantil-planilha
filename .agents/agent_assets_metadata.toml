@@ -6,3 +6,9 @@ id = "XD2tRORAoG3KyGmR46Wlx"
 uri = "file://espaco-biblico.tar.gz"
 type = "unspecified"
 title = "Espaço Bíblico Infantil — código completo"
+
+[[outputs]]
+id = "tabgRS2K8iqnHw3AHHdJl"
+uri = "file://espaco-biblico.zip"
+type = "unspecified"
+title = "Espaço Bíblico Infantil — projeto completo (.zip)"
