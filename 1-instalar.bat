@@ -9,7 +9,12 @@ if exist pnpm-lock.yaml (
     echo Removendo lockfile antigo para recalcular pacotes do Windows...
     del /f /q pnpm-lock.yaml
 )
-call pnpm install
+if exist node_modules (
+    echo Removendo instalacao anterior incompleta...
+    rmdir /s /q node_modules
+)
+for /d /r %%d in (node_modules) do @if exist "%%d" rmdir /s /q "%%d"
+call pnpm install --force
 if errorlevel 1 (
     echo ERRO: Falha ao instalar dependências.
     pause
