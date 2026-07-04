@@ -1,0 +1,41 @@
+
+> @workspace/espaco-biblico@0.0.0 dev C:\Users\henri\Downloads\espaco_biblicoofc\artifacts\espaco-biblico
+> vite --config vite.config.ts --host 0.0.0.0
+
+C:\Users\henri\Downloads\espaco_biblicoofc\node_modules\.pnpm\rollup@4.62.2\node_modules\rollup\dist\native.js:121
+                throw new Error(
+                      ^
+
+Error: Cannot find module @rollup/rollup-win32-x64-msvc. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+    at requireWithFriendlyError (C:\Users\henri\Downloads\espaco_biblicoofc\node_modules\.pnpm\rollup@4.62.2\node_modules\rollup\dist\native.js:121:9)
+    at Object.<anonymous> (C:\Users\henri\Downloads\espaco_biblicoofc\node_modules\.pnpm\rollup@4.62.2\node_modules\rollup\dist\native.js:130:76)
+    ... 3 lines matching cause stack trace ...
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at cjsLoader (node:internal/modules/esm/translators:298:15)
+    at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:240:7)
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24) {
+  [cause]: Error: Cannot find module '@rollup/rollup-win32-x64-msvc'
+  Require stack:
+  - C:\Users\henri\Downloads\espaco_biblicoofc\node_modules\.pnpm\rollup@4.62.2\node_modules\rollup\dist\native.js
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1212:15)
+      at Module._load (node:internal/modules/cjs/loader:1043:27)
+      at Module.require (node:internal/modules/cjs/loader:1298:19)
+      at require (node:internal/modules/helpers:182:18)
+      at requireWithFriendlyError (C:\Users\henri\Downloads\espaco_biblicoofc\node_modules\.pnpm\rollup@4.62.2\node_modules\rollup\dist\native.js:103:10)
+      at Object.<anonymous> (C:\Users\henri\Downloads\espaco_biblicoofc\node_modules\.pnpm\rollup@4.62.2\node_modules\rollup\dist\native.js:130:76)
+      at Module._compile (node:internal/modules/cjs/loader:1529:14)
+      at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+      at Module.load (node:internal/modules/cjs/loader:1275:32)
+      at Module._load (node:internal/modules/cjs/loader:1096:12) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      'C:\\Users\\henri\\Downloads\\espaco_biblicoofc\\node_modules\\.pnpm\\rollup@4.62.2\\node_modules\\rollup\\dist\\native.js'
+    ]
+  }
+}
+
+Node.js v20.19.0
+C:\Users\henri\Downloads\espaco_biblicoofc\artifacts\espaco-biblico:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @workspace/espaco-biblico@0.0.0 dev: `vite --config vite.config.ts --host 0.0.0.0`
+Exit status 1
