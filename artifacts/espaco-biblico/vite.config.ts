@@ -118,6 +118,19 @@ export default defineConfig({
     fs: {
       strict: true,
     },
+    // Only needed for local (non-Replit) runs: on Replit the shared reverse
+    // proxy already routes /api to the api-server service before Vite ever
+    // sees the request, so this proxy is inert there.
+    ...(process.env.REPL_ID === undefined
+      ? {
+          proxy: {
+            "/api": {
+              target: `http://localhost:${process.env.API_PORT ?? "8080"}`,
+              changeOrigin: true,
+            },
+          },
+        }
+      : {}),
   },
   preview: {
     port,

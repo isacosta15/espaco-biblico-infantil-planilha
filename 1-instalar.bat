@@ -5,6 +5,10 @@ echo ============================================
 echo.
 
 echo [1/3] Instalando dependências...
+if exist pnpm-lock.yaml (
+    echo Removendo lockfile antigo para recalcular pacotes do Windows...
+    del /f /q pnpm-lock.yaml
+)
 call pnpm install
 if errorlevel 1 (
     echo ERRO: Falha ao instalar dependências.
