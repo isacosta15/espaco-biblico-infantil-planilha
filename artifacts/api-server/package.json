@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "cross-env NODE_ENV=development pnpm run build && pnpm run start",
-    "dev:local": "cross-env NODE_ENV=development pnpm run build && cross-env NODE_ENV=development node --enable-source-maps --env-file-if-exists=../../.env ./dist/index.mjs",
+    "dev:local": "cross-env NODE_ENV=development pnpm run build && cross-env NODE_ENV=development pnpm run start",
     "build": "node ./build.mjs",
-    "start": "node --enable-source-maps --env-file-if-exists=../../.env ./dist/index.mjs",
+    "start": "node --enable-source-maps ./dist/index.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
@@ -16,6 +16,7 @@
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "drizzle-orm": "catalog:",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
