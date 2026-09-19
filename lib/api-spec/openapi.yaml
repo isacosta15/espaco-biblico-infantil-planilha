@@ -570,6 +570,11 @@ components:
         password:
           type: string
           minLength: 1
+        access:
+          type: string
+          enum: [general, admin]
+          default: general
+          description: Login portal. The admin portal only accepts administrator accounts.
 
     AuthResponse:
       type: object

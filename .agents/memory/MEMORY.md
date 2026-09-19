@@ -1,1 +1,2 @@
 - [Sincronização offline](offline-sync.md) — alterações sem internet ficam em fila local e só são enviadas quando a pessoa aciona a sincronização manual.
+- [Acessos e retenção](admin-access-and-retention.md) — o login administrativo é separado e registros excluídos não são apagados automaticamente.

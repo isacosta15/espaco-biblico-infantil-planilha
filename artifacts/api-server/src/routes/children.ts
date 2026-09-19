@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { db, childrenTable, congregationsTable, attendanceTable, usersTable } from "@workspace/db";
-import { eq, ilike, sql, and, count, max, isNull, isNotNull, lte } from "drizzle-orm";
+import { eq, ilike, sql, and, count, max, isNull, isNotNull } from "drizzle-orm";
 import {
   ListChildrenQueryParams,
   CreateChildBody,
@@ -34,8 +34,11 @@ function getUser(req: Request): JwtPayload {
   return (req as typeof req & { user: JwtPayload }).user;
 }
 
-function requireAdmin(req: Request, res: Response): boolean {
-  if (getUser(req).role !== "admin") {
+async function requireAdmin(req: Request, res: Response): Promise<boolean> {
+  const [user] = await db.select({ role: usersTable.role })
+    .from(usersTable)
+    .where(eq(usersTable.id, getUser(req).userId));
+  if (user?.role !== "admin") {
     res.status(403).json({ error: "Apenas administradores podem acessar a lixeira." });
     return false;
   }
@@ -44,17 +47,6 @@ function requireAdmin(req: Request, res: Response): boolean {
 
 function toDateString(value: string | Date): string {
   return value instanceof Date ? value.toISOString().split("T")[0] : value;
-}
-
-async function purgeExpiredDeletedChildren(): Promise<void> {
-  const expired = await db.select({ id: childrenTable.id })
-    .from(childrenTable)
-    .where(and(isNotNull(childrenTable.deletedAt), lte(childrenTable.deletionExpiresAt, new Date())));
-
-  for (const child of expired) {
-    await db.delete(attendanceTable).where(eq(attendanceTable.childId, child.id));
-    await db.delete(childrenTable).where(eq(childrenTable.id, child.id));
-  }
 }
 
 async function enrichChild(child: typeof childrenTable.$inferSelect, todayStr: string) {
@@ -77,7 +69,6 @@ async function enrichChild(child: typeof childrenTable.$inferSelect, todayStr: s
 }
 
 router.get("/children/birthdays", authMiddleware, async (_req, res): Promise<void> => {
-  await purgeExpiredDeletedChildren();
   const today = new Date();
   const month = today.getMonth() + 1;
   const todayStr = getTodayStr();
@@ -89,7 +80,6 @@ router.get("/children/birthdays", authMiddleware, async (_req, res): Promise<voi
 });
 
 router.get("/children/most-absent", authMiddleware, async (req, res): Promise<void> => {
-  await purgeExpiredDeletedChildren();
   const params = GetMostAbsentChildrenQueryParams.safeParse(req.query);
   const limit = params.success && params.data.limit ? params.data.limit : 10;
   const todayStr = getTodayStr();
@@ -139,7 +129,6 @@ router.get("/children/most-absent", authMiddleware, async (req, res): Promise<vo
 });
 
 router.get("/children", authMiddleware, async (req, res): Promise<void> => {
-  await purgeExpiredDeletedChildren();
   const params = ListChildrenQueryParams.safeParse(req.query);
   const todayStr = getTodayStr();
 
@@ -190,8 +179,7 @@ router.get("/children", authMiddleware, async (req, res): Promise<void> => {
 });
 
 router.get("/children/deleted", authMiddleware, async (req, res): Promise<void> => {
-  if (!requireAdmin(req, res)) return;
-  await purgeExpiredDeletedChildren();
+  if (!(await requireAdmin(req, res))) return;
   const rows = await db.select({
     child: childrenTable,
     deletedByName: usersTable.name,
@@ -225,7 +213,7 @@ router.post("/children", authMiddleware, async (req, res): Promise<void> => {
 });
 
 router.post("/children/:id/restore", authMiddleware, async (req, res): Promise<void> => {
-  if (!requireAdmin(req, res)) return;
+  if (!(await requireAdmin(req, res))) return;
   const params = GetChildParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });

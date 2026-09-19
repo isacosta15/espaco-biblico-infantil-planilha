@@ -9,10 +9,23 @@ export interface HealthStatus {
   status: string;
 }
 
+/**
+ * Login portal. The admin portal only accepts administrator accounts.
+ */
+export type LoginInputAccess = typeof LoginInputAccess[keyof typeof LoginInputAccess];
+
+
+export const LoginInputAccess = {
+  general: 'general',
+  admin: 'admin',
+} as const;
+
 export interface LoginInput {
   email: string;
   /** @minLength 1 */
   password: string;
+  /** Login portal. The admin portal only accepts administrator accounts. */
+  access?: LoginInputAccess;
 }
 
 export type UserRole = typeof UserRole[keyof typeof UserRole];

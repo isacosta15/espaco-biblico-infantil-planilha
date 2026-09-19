@@ -7,7 +7,7 @@ import {
   useRestoreChild,
 } from "@workspace/api-client-react";
 import { Clock3, RotateCcw, Trash2 } from "lucide-react";
-import { format, formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,7 +41,7 @@ export default function LixeiraPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Lixeira administrativa</h1>
         <p className="text-muted-foreground">
-          Cadastros excluídos ficam disponíveis por 30 dias para restauração.
+          Cadastros excluídos ficam preservados até uma restauração administrativa.
         </p>
       </div>
 
@@ -65,7 +65,7 @@ export default function LixeiraPage() {
                   </p>
                   <p className="mt-1 flex items-center gap-1 text-xs text-amber-800">
                     <Clock3 className="h-3.5 w-3.5" />
-                    Expira {formatDistanceToNow(new Date(child.deletionExpiresAt), { addSuffix: true, locale: ptBR })}
+                    Cadastro preservado na lixeira até restauração
                   </p>
                 </div>
                 <Button

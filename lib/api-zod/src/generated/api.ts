@@ -20,11 +20,12 @@ export const HealthCheckResponse = zod.object({
  * @summary Login with email and password
  */
 
-
+export const loginBodyAccessDefault = `general`;
 
 export const LoginBody = zod.object({
   "email": zod.string().email(),
-  "password": zod.string().min(1)
+  "password": zod.string().min(1),
+  "access": zod.enum(['general', 'admin']).default(loginBodyAccessDefault).describe('Login portal. The admin portal only accepts administrator accounts.')
 })
 
 export const LoginResponse = zod.object({

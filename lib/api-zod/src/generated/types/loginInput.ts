@@ -5,9 +5,12 @@
  * Espaço Bíblico Infantil API
  * OpenAPI spec version: 0.1.0
  */
+import type { LoginInputAccess } from './loginInputAccess';
 
 export interface LoginInput {
   email: string;
   /** @minLength 1 */
   password: string;
+  /** Login portal. The admin portal only accepts administrator accounts. */
+  access?: LoginInputAccess;
 }

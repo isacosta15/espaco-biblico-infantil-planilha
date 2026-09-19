@@ -14,7 +14,7 @@ router.post("/auth/login", async (req, res): Promise<void> => {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
-  const { email, password } = parsed.data;
+  const { email, password, access = "general" } = parsed.data;
   const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email));
   if (!user) {
     res.status(401).json({ error: "Email ou senha inválidos" });
@@ -23,6 +23,10 @@ router.post("/auth/login", async (req, res): Promise<void> => {
   const valid = await bcrypt.compare(password, user.password);
   if (!valid) {
     res.status(401).json({ error: "Email ou senha inválidos" });
+    return;
+  }
+  if (access === "admin" && user.role !== "admin") {
+    res.status(403).json({ error: "Este acesso é exclusivo para administradores." });
     return;
   }
   const token = signToken({ userId: user.id, email: user.email, role: user.role });

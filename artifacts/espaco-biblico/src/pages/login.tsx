@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -25,7 +25,7 @@ const loginSchema = z.object({
   password: z.string().min(1, "A senha é obrigatória"),
 });
 
-export default function LoginPage() {
+export default function LoginPage({ adminPortal = false }: { adminPortal?: boolean }) {
   const [_, setLocation] = useLocation();
   const { toast } = useToast();
   
@@ -41,7 +41,7 @@ export default function LoginPage() {
 
   function onSubmit(values: z.infer<typeof loginSchema>) {
     loginMutation.mutate(
-      { data: values },
+      { data: { ...values, access: adminPortal ? "admin" : "general" } },
       {
         onSuccess: (data) => {
           setToken(data.token);
@@ -69,15 +69,21 @@ export default function LoginPage() {
           <div className="bg-primary/10 p-4 rounded-full mb-4">
             <BookOpen className="w-12 h-12" />
           </div>
-          <h1 className="text-3xl font-bold text-foreground">Espaço Bíblico</h1>
-          <p className="text-muted-foreground mt-1">Check-in Infantil</p>
+           <h1 className="text-3xl font-bold text-foreground">Espaço Bíblico</h1>
+           <p className="text-muted-foreground mt-1">
+             {adminPortal ? "Acesso administrativo" : "Check-in Infantil"}
+           </p>
         </div>
 
         <Card className="border-0 shadow-lg">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-center">Entrar</CardTitle>
+             <CardTitle className="text-2xl text-center">
+               {adminPortal ? "Entrar como administradora" : "Entrar"}
+             </CardTitle>
             <CardDescription className="text-center">
-              Insira seus dados para acessar o sistema
+               {adminPortal
+                 ? "Acesso à lixeira e às funções administrativas"
+                 : "Insira seus dados para acessar o sistema"}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -116,6 +122,23 @@ export default function LoginPage() {
                 >
                   {loginMutation.isPending ? "Entrando..." : "Acessar"}
                 </Button>
+                <div className="pt-2 text-center text-sm text-muted-foreground">
+                  {adminPortal ? (
+                    <>
+                      Acesso geral?{" "}
+                      <Link href="/login" className="font-medium text-primary hover:underline">
+                        Entrar como usuário
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      Administradora?{" "}
+                      <Link href="/admin-login" className="font-medium text-primary hover:underline">
+                        Acessar área administrativa
+                      </Link>
+                    </>
+                  )}
+                </div>
               </form>
             </Form>
           </CardContent>

@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import type { Request, Response, NextFunction } from "express";
 
-const JWT_SECRET = process.env.JWT_SECRET ?? "ebi-secret-key-change-in-production";
+const JWT_SECRET = process.env.SESSION_SECRET ?? process.env.JWT_SECRET ?? "ebi-development-secret";
 
 export interface JwtPayload {
   userId: number;

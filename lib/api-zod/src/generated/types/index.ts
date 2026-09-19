@@ -32,6 +32,7 @@ export * from './listChildrenGender';
 export * from './listChildrenParams';
 export * from './listDailyReportsParams';
 export * from './loginInput';
+export * from './loginInputAccess';
 export * from './user';
 export * from './userRole';
 export * from './weeklyStat';
