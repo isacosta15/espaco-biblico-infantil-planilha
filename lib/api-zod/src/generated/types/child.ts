@@ -9,6 +9,8 @@ import type { ChildGender } from './childGender';
 
 export interface Child {
   id: number;
+  /** @minimum 1 */
+  childNumber: number;
   fullName: string;
   birthDate: Date;
   gender: ChildGender;

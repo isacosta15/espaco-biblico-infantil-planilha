@@ -25,6 +25,9 @@ export function ChildCard({ child, action }: ChildCardProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between mb-1 gap-2">
             <h3 className="font-bold text-lg text-foreground truncate">{child.fullName}</h3>
+            <span className="text-xs font-semibold text-primary/80 shrink-0">
+              {child.childNumber > 0 ? `Nº ${child.childNumber}` : "Pendente"}
+            </span>
             {isOlder && (
               <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300 shrink-0">
                 12+

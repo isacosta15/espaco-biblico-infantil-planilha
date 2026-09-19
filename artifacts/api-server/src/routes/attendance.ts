@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db, attendanceTable, childrenTable, congregationsTable, dailyReportsTable } from "@workspace/db";
-import { eq, and, sql, count } from "drizzle-orm";
+import { eq, and, sql, count, isNull } from "drizzle-orm";
 import { MarkAttendanceBody, ListAttendanceQueryParams } from "@workspace/api-zod";
 import { authMiddleware } from "../lib/auth";
 
@@ -19,13 +19,17 @@ function calcAge(birthDate: string): number {
   return age;
 }
 
+function toDateString(value: string | Date): string {
+  return value instanceof Date ? value.toISOString().split("T")[0] : value;
+}
+
 async function updateDailyReport(date: string): Promise<void> {
   const girlsCount = await db.select({ cnt: count() }).from(attendanceTable)
     .innerJoin(childrenTable, eq(attendanceTable.childId, childrenTable.id))
-    .where(and(eq(attendanceTable.attendanceDate, date), eq(childrenTable.gender, "F")));
+    .where(and(eq(attendanceTable.attendanceDate, date), eq(childrenTable.gender, "F"), isNull(childrenTable.deletedAt)));
   const boysCount = await db.select({ cnt: count() }).from(attendanceTable)
     .innerJoin(childrenTable, eq(attendanceTable.childId, childrenTable.id))
-    .where(and(eq(attendanceTable.attendanceDate, date), eq(childrenTable.gender, "M")));
+    .where(and(eq(attendanceTable.attendanceDate, date), eq(childrenTable.gender, "M"), isNull(childrenTable.deletedAt)));
 
   const totalGirls = Number(girlsCount[0]?.cnt ?? 0);
   const totalBoys = Number(boysCount[0]?.cnt ?? 0);
@@ -50,11 +54,11 @@ router.get("/attendance/dates", authMiddleware, async (_req, res): Promise<void>
 router.get("/attendance", authMiddleware, async (req, res): Promise<void> => {
   const params = ListAttendanceQueryParams.safeParse(req.query);
   const todayStr = getTodayStr();
-  const dateFilter = (params.success && params.data.date) ? params.data.date : todayStr;
+  const dateFilter = params.success && params.data.date ? toDateString(params.data.date) : todayStr;
 
   const rows = await db.select().from(attendanceTable)
     .innerJoin(childrenTable, eq(attendanceTable.childId, childrenTable.id))
-    .where(eq(attendanceTable.attendanceDate, dateFilter))
+    .where(and(eq(attendanceTable.attendanceDate, dateFilter), isNull(childrenTable.deletedAt)))
     .orderBy(attendanceTable.attendanceTime);
 
   const enriched = await Promise.all(rows.map(async (row) => {
@@ -106,7 +110,13 @@ router.post("/attendance", authMiddleware, async (req, res): Promise<void> => {
     return;
   }
 
-  const date = parsed.data.attendanceDate ?? getTodayStr();
+  const date = parsed.data.attendanceDate ? toDateString(parsed.data.attendanceDate) : getTodayStr();
+  const [activeChild] = await db.select({ id: childrenTable.id }).from(childrenTable)
+    .where(and(eq(childrenTable.id, parsed.data.childId), isNull(childrenTable.deletedAt)));
+  if (!activeChild) {
+    res.status(404).json({ error: "Criança não encontrada." });
+    return;
+  }
   const now = new Date();
   const timeStr = now.toTimeString().slice(0, 8);
 

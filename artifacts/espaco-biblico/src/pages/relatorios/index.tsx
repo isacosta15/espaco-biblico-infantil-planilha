@@ -30,9 +30,8 @@ export default function RelatoriosPage() {
   const today = format(new Date(), 'yyyy-MM-dd');
 
   const { data: reports, isLoading: isReportsLoading } = useListDailyReports({
-    query: {
-      queryKey: ['/api/reports/daily', { startDate: thirtyDaysAgo, endDate: today }]
-    }
+    startDate: thirtyDaysAgo,
+    endDate: today,
   });
 
   const { data: weeklyStats, isLoading: isWeeklyLoading } = useGetWeeklyStats();

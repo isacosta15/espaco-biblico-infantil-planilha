@@ -10,6 +10,10 @@ function getTodayStr(): string {
   return new Date().toISOString().split("T")[0];
 }
 
+function toDateString(value: string | Date): string {
+  return value instanceof Date ? value.toISOString().split("T")[0] : value;
+}
+
 router.get("/reports/daily", authMiddleware, async (req, res): Promise<void> => {
   const params = ListDailyReportsQueryParams.safeParse(req.query);
   let query = db.select().from(dailyReportsTable).$dynamic();
@@ -17,10 +21,10 @@ router.get("/reports/daily", authMiddleware, async (req, res): Promise<void> => 
   if (params.success) {
     const conditions = [];
     if (params.data.startDate) {
-      conditions.push(gte(dailyReportsTable.reportDate, params.data.startDate));
+      conditions.push(gte(dailyReportsTable.reportDate, toDateString(params.data.startDate)));
     }
     if (params.data.endDate) {
-      conditions.push(lte(dailyReportsTable.reportDate, params.data.endDate));
+      conditions.push(lte(dailyReportsTable.reportDate, toDateString(params.data.endDate)));
     }
     if (conditions.length > 0) {
       query = query.where(and(...conditions));
@@ -38,7 +42,7 @@ router.get("/reports/daily/:date", authMiddleware, async (req, res): Promise<voi
     return;
   }
   const [report] = await db.select().from(dailyReportsTable)
-    .where(eq(dailyReportsTable.reportDate, params.data.date));
+    .where(eq(dailyReportsTable.reportDate, toDateString(params.data.date)));
   if (!report) {
     res.status(404).json({ error: "Relatório não encontrado" });
     return;

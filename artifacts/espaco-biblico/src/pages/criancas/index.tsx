@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { useListChildren, useListCongregations, ListChildrenGender } from "@workspace/api-client-react";
 import { Search, Plus, Filter } from "lucide-react";
@@ -15,17 +15,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { getOfflineChildren, subscribeToOfflineQueue } from "@/lib/offline-sync";
 
 export default function CriancasPage() {
   const [search, setSearch] = useState("");
   const [gender, setGender] = useState<ListChildrenGender | undefined>(undefined);
   const [congregationId, setCongregationId] = useState<string>("all");
+  const [offlineChildren, setOfflineChildren] = useState(getOfflineChildren);
   
   const { data: congregations } = useListCongregations();
   const { data: children, isLoading } = useListChildren({
-    query: {
-      queryKey: ['/api/children', { search, gender, congregationId: congregationId === "all" ? undefined : Number(congregationId) }]
-    }
+    search: search || undefined,
+    gender,
+    congregationId: congregationId === "all" ? undefined : Number(congregationId),
+  });
+  useEffect(() => subscribeToOfflineQueue(() => setOfflineChildren(getOfflineChildren())), []);
+  const displayedChildren = [...offlineChildren, ...(children ?? [])].filter((child) => {
+    const matchesSearch = !search || child.fullName.toLowerCase().includes(search.toLowerCase());
+    const matchesGender = !gender || child.gender === gender;
+    const matchesCongregation = congregationId === "all" || child.congregationId === Number(congregationId);
+    return matchesSearch && matchesGender && matchesCongregation;
   });
 
   return (
@@ -85,8 +94,8 @@ export default function CriancasPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {isLoading ? (
           Array(6).fill(0).map((_, i) => <Skeleton key={i} className="h-32 rounded-xl" />)
-        ) : children && children.length > 0 ? (
-          children.map((child) => (
+        ) : displayedChildren.length > 0 ? (
+          displayedChildren.map((child) => (
             <ChildCard key={child.id} child={child} />
           ))
         ) : (

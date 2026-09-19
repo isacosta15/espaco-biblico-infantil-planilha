@@ -87,6 +87,8 @@ export const ChildGender = {
 
 export interface Child {
   id: number;
+  /** @minimum 1 */
+  childNumber: number;
   fullName: string;
   birthDate: string;
   gender: ChildGender;
@@ -153,6 +155,14 @@ export interface ChildUpdate {
   congregationId?: number;
 }
 
+export type DeletedChild = Child & ({
+  deletedAt: string;
+  deletionExpiresAt: string;
+  deletedBy?: number | null;
+  /** @nullable */
+  deletedByName?: string | null;
+});
+
 export type ChildWithFrequencyGender = typeof ChildWithFrequencyGender[keyof typeof ChildWithFrequencyGender];
 
 
@@ -163,6 +173,7 @@ export const ChildWithFrequencyGender = {
 
 export interface ChildWithFrequency {
   id: number;
+  childNumber: number;
   fullName: string;
   birthDate: string;
   gender: ChildWithFrequencyGender;

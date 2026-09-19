@@ -34,6 +34,7 @@ import type {
   CongregationUpdate,
   DailyReport,
   DashboardStats,
+  DeletedChild,
   GetMostAbsentChildrenParams,
   HealthStatus,
   ListAttendanceParams,
@@ -803,6 +804,83 @@ export const useCreateChild = <TError = ErrorType<unknown>,
       return useMutation(getCreateChildMutationOptions(options));
     }
 
+export const getListDeletedChildrenUrl = () => {
+
+
+
+
+  return `/api/children/deleted`
+}
+
+/**
+ * @summary List children deleted within the retention period
+ */
+export const listDeletedChildren = async ( options?: RequestInit): Promise<DeletedChild[]> => {
+
+  return customFetch<DeletedChild[]>(getListDeletedChildrenUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListDeletedChildrenQueryKey = () => {
+    return [
+    `/api/children/deleted`
+    ] as const;
+    }
+
+
+export const getListDeletedChildrenQueryOptions = <TData = Awaited<ReturnType<typeof listDeletedChildren>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listDeletedChildren>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListDeletedChildrenQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listDeletedChildren>>> = ({ signal }) => listDeletedChildren({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listDeletedChildren>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListDeletedChildrenQueryResult = NonNullable<Awaited<ReturnType<typeof listDeletedChildren>>>
+export type ListDeletedChildrenQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List children deleted within the retention period
+ */
+
+export function useListDeletedChildren<TData = Awaited<ReturnType<typeof listDeletedChildren>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listDeletedChildren>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListDeletedChildrenQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
 export const getGetBirthdaysThisMonthUrl = () => {
 
 
@@ -1181,6 +1259,76 @@ export const useDeleteChild = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getDeleteChildMutationOptions(options));
+    }
+
+export const getRestoreChildUrl = (id: number,) => {
+
+
+
+
+  return `/api/children/${id}/restore`
+}
+
+/**
+ * @summary Restore a deleted child
+ */
+export const restoreChild = async (id: number, options?: RequestInit): Promise<Child> => {
+
+  return customFetch<Child>(getRestoreChildUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getRestoreChildMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restoreChild>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof restoreChild>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['restoreChild'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof restoreChild>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  restoreChild(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RestoreChildMutationResult = NonNullable<Awaited<ReturnType<typeof restoreChild>>>
+
+    export type RestoreChildMutationError = ErrorType<void>
+
+    /**
+ * @summary Restore a deleted child
+ */
+export const useRestoreChild = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restoreChild>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof restoreChild>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getRestoreChildMutationOptions(options));
     }
 
 export const getGetChildFrequencyUrl = (id: number,) => {

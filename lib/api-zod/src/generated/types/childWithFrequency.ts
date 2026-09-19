@@ -9,6 +9,7 @@ import type { ChildWithFrequencyGender } from './childWithFrequencyGender';
 
 export interface ChildWithFrequency {
   id: number;
+  childNumber: number;
   fullName: string;
   birthDate: Date;
   gender: ChildWithFrequencyGender;

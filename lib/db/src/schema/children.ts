@@ -5,6 +5,7 @@ import { congregationsTable } from "./congregations";
 
 export const childrenTable = pgTable("children", {
   id: serial("id").primaryKey(),
+  childNumber: serial("child_number").notNull().unique(),
   fullName: text("full_name").notNull(),
   birthDate: date("birth_date", { mode: "string" }).notNull(),
   gender: text("gender", { enum: ["M", "F"] }).notNull(),
@@ -16,6 +17,9 @@ export const childrenTable = pgTable("children", {
   observations: text("observations"),
   congregationId: integer("congregation_id").references(() => congregationsTable.id),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  deletedBy: integer("deleted_by"),
+  deletionExpiresAt: timestamp("deletion_expires_at", { withTimezone: true }),
 });
 
 export const insertChildSchema = createInsertSchema(childrenTable).omit({ id: true, createdAt: true });

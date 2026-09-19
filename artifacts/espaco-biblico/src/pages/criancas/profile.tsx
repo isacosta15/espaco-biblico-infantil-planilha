@@ -4,7 +4,10 @@ import {
   useGetChild, 
   useGetChildFrequency, 
   useGetChildAttendance,
-  useDeleteChild
+  useDeleteChild,
+  getGetChildQueryKey,
+  getGetChildFrequencyQueryKey,
+  getGetChildAttendanceQueryKey,
 } from "@workspace/api-client-react";
 import { calculateAge, getGenderColor, formatWhatsAppLink, formatDate, formatDateTime } from "@/lib/utils";
 import { 
@@ -37,6 +40,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { enqueueOfflineOperation } from "@/lib/offline-sync";
 
 export default function ChildProfilePage() {
   const [, params] = useRoute("/criancas/:id");
@@ -44,13 +48,22 @@ export default function ChildProfilePage() {
   const id = params?.id ? parseInt(params.id, 10) : 0;
   const { toast } = useToast();
 
-  const { data: child, isLoading: isChildLoading } = useGetChild(id, { query: { enabled: !!id } });
-  const { data: frequency, isLoading: isFreqLoading } = useGetChildFrequency(id, { query: { enabled: !!id } });
-  const { data: attendanceHistory, isLoading: isAttLoading } = useGetChildAttendance(id, { query: { enabled: !!id } });
+  const { data: child, isLoading: isChildLoading } = useGetChild(id, { query: { enabled: !!id, queryKey: getGetChildQueryKey(id) } });
+  const { data: frequency, isLoading: isFreqLoading } = useGetChildFrequency(id, { query: { enabled: !!id, queryKey: getGetChildFrequencyQueryKey(id) } });
+  const { data: attendanceHistory, isLoading: isAttLoading } = useGetChildAttendance(id, { query: { enabled: !!id, queryKey: getGetChildAttendanceQueryKey(id) } });
   
   const deleteMutation = useDeleteChild();
 
   const handleDelete = () => {
+    if (!navigator.onLine) {
+      enqueueOfflineOperation({ kind: "deleteChild", childId: id });
+      toast({
+        title: "Exclusão salva neste dispositivo",
+        description: "O cadastro ficará disponível para a administradora após a sincronização.",
+      });
+      setLocation("/criancas");
+      return;
+    }
     deleteMutation.mutate(
       { id },
       {
@@ -128,6 +141,7 @@ export default function ChildProfilePage() {
                   <div>
                     <h1 className="text-3xl font-bold text-foreground">{child.fullName}</h1>
                     <div className="flex flex-wrap items-center gap-2 mt-2">
+                      <Badge variant="default">Nº {child.childNumber}</Badge>
                       <Badge variant="outline" className={getGenderColor(child.gender)}>
                         {child.gender === 'F' ? 'Menina' : 'Menino'}
                       </Badge>
@@ -146,7 +160,7 @@ export default function ChildProfilePage() {
                       )}
                       {child.foodRestriction && (
                         <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
-                          🥜 Restrição
+                           Restrição alimentar
                         </Badge>
                       )}
                     </div>

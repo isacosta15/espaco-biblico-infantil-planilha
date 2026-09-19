@@ -24,6 +24,7 @@ export * from './congregationInput';
 export * from './congregationUpdate';
 export * from './dailyReport';
 export * from './dashboardStats';
+export * from './deletedChild';
 export * from './getMostAbsentChildrenParams';
 export * from './healthStatus';
 export * from './listAttendanceParams';

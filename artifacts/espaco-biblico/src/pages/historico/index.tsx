@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { useListAttendanceDates, useListAttendance } from "@workspace/api-client-react";
+import { useListAttendanceDates, useListAttendance, getListAttendanceQueryKey } from "@workspace/api-client-react";
 import { Calendar as CalendarIcon, ChevronRight } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,7 +14,7 @@ export default function HistoricoPage() {
   const { data: dates, isLoading: isLoadingDates } = useListAttendanceDates();
   const { data: attendanceDetails, isLoading: isLoadingDetails } = useListAttendance(
     { date: selectedDate || undefined },
-    { query: { enabled: !!selectedDate } }
+    { query: { enabled: !!selectedDate, queryKey: getListAttendanceQueryKey({ date: selectedDate || undefined }) } }
   );
 
   return (

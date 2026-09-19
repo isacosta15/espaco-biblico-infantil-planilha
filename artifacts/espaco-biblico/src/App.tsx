@@ -13,6 +13,7 @@ import ChildFormPage from "@/pages/criancas/form";
 import CongregacoesPage from "@/pages/congregacoes";
 import HistoricoPage from "@/pages/historico";
 import RelatoriosPage from "@/pages/relatorios";
+import LixeiraPage from "@/pages/lixeira";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ function Router() {
       <Route path="/congregacoes" component={() => <ProtectedRoute component={CongregacoesPage} />} />
       <Route path="/historico" component={() => <ProtectedRoute component={HistoricoPage} />} />
       <Route path="/relatorios" component={() => <ProtectedRoute component={RelatoriosPage} />} />
+      <Route path="/lixeira" component={() => <ProtectedRoute component={LixeiraPage} />} />
       
       <Route component={NotFound} />
     </Switch>

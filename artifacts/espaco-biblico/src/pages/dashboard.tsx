@@ -65,7 +65,7 @@ export default function DashboardPage() {
   const { data: stats, isLoading: statsLoading } = useGetDashboardStats();
   const { data: weeklyStats, isLoading: weeklyLoading } = useGetWeeklyStats();
   const { data: birthdays, isLoading: birthdaysLoading } = useGetBirthdaysThisMonth();
-  const { data: mostAbsent, isLoading: absentLoading } = useGetMostAbsentChildren({ query: { limit: 5 } });
+  const { data: mostAbsent, isLoading: absentLoading } = useGetMostAbsentChildren({ limit: 5 });
 
   const chartData = useMemo(() => {
     if (!weeklyStats) return [];

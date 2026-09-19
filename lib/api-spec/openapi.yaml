@@ -229,6 +229,21 @@ paths:
               schema:
                 $ref: "#/components/schemas/Child"
 
+  /children/deleted:
+    get:
+      operationId: listDeletedChildren
+      tags: [children]
+      summary: List children deleted within the retention period
+      responses:
+        "200":
+          description: Deleted children available for restoration
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DeletedChild"
+
   /children/birthdays:
     get:
       operationId: getBirthdaysThisMonth
@@ -325,6 +340,27 @@ paths:
           description: Deleted
         "404":
           description: Not found
+
+  /children/{id}/restore:
+    post:
+      operationId: restoreChild
+      tags: [children]
+      summary: Restore a deleted child
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Restored child
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Child"
+        "404":
+          description: Deleted child not found
 
   /children/{id}/frequency:
     get:
@@ -625,10 +661,13 @@ components:
 
     Child:
       type: object
-      required: [id, fullName, birthDate, gender, guardianName, guardianPhone]
+      required: [id, childNumber, fullName, birthDate, gender, guardianName, guardianPhone]
       properties:
         id:
           type: integer
+        childNumber:
+          type: integer
+          minimum: 1
         fullName:
           type: string
         birthDate:
@@ -718,11 +757,31 @@ components:
         congregationId:
           type: integer
 
+    DeletedChild:
+      allOf:
+        - $ref: "#/components/schemas/Child"
+        - type: object
+          required: [deletedAt, deletionExpiresAt]
+          properties:
+            deletedAt:
+              type: string
+              format: date-time
+            deletionExpiresAt:
+              type: string
+              format: date-time
+            deletedBy:
+              type: integer
+              nullable: true
+            deletedByName:
+              type: ["string", "null"]
+
     ChildWithFrequency:
       type: object
-      required: [id, fullName, birthDate, gender, guardianName, guardianPhone, absenceCount]
+      required: [id, childNumber, fullName, birthDate, gender, guardianName, guardianPhone, absenceCount]
       properties:
         id:
+          type: integer
+        childNumber:
           type: integer
         fullName:
           type: string

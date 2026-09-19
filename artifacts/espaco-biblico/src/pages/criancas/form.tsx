@@ -7,6 +7,7 @@ import {
   useCreateChild, 
   useUpdateChild, 
   useGetChild, 
+  getGetChildQueryKey,
   useListCongregations,
   ChildInputGender
 } from "@workspace/api-client-react";
@@ -35,6 +36,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { ArrowLeft } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { saveOfflineChild, updateOfflineChild } from "@/lib/offline-sync";
 
 const childSchema = z.object({
   fullName: z.string().min(3, "Nome completo é obrigatório"),
@@ -59,7 +61,7 @@ export default function ChildFormPage() {
   const { toast } = useToast();
 
   const { data: congregations } = useListCongregations();
-  const { data: child, isLoading } = useGetChild(id, { query: { enabled: !!isEditing } });
+  const { data: child, isLoading } = useGetChild(id, { query: { enabled: !!isEditing, queryKey: getGetChildQueryKey(id) } });
   
   const createMutation = useCreateChild();
   const updateMutation = useUpdateChild();
@@ -107,6 +109,24 @@ export default function ChildFormPage() {
       congregationId: values.congregationId || undefined,
       foodRestrictionDescription: values.foodRestriction ? values.foodRestrictionDescription : undefined,
     };
+
+    if (!navigator.onLine) {
+      if (isEditing) {
+        updateOfflineChild(id, data);
+        toast({
+          title: "Alteração salva neste dispositivo",
+          description: "Clique em “Sincronizar agora” quando a internet voltar.",
+        });
+      } else {
+        saveOfflineChild(data);
+        toast({
+          title: "Cadastro salvo neste dispositivo",
+          description: "A criança receberá o número assim que você sincronizar.",
+        });
+      }
+      setLocation("/criancas");
+      return;
+    }
 
     if (isEditing) {
       updateMutation.mutate(
@@ -192,8 +212,11 @@ export default function ChildFormPage() {
                     name="gender"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Gênero</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value || ""}>
+                        <FormLabel>Sexo</FormLabel>
+                        <Select
+                          onValueChange={(value) => field.onChange(value as "M" | "F")}
+                          value={field.value ?? undefined}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Selecione" />

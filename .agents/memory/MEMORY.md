@@ -1,0 +1,1 @@
+- [Sincronização offline](offline-sync.md) — alterações sem internet ficam em fila local e só são enviadas quando a pessoa aciona a sincronização manual.

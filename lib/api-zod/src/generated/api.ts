@@ -160,8 +160,12 @@ export const ListChildrenQueryParams = zod.object({
   "absentToday": zod.coerce.boolean().optional()
 })
 
+
+
+
 export const ListChildrenResponseItem = zod.object({
   "id": zod.number(),
+  "childNumber": zod.number().min(1),
   "fullName": zod.string(),
   "birthDate": zod.coerce.date(),
   "gender": zod.enum(['M', 'F']),
@@ -203,10 +207,46 @@ export const CreateChildBody = zod.object({
 
 
 /**
+ * @summary List children deleted within the retention period
+ */
+
+
+
+export const ListDeletedChildrenResponseItem = zod.object({
+  "id": zod.number(),
+  "childNumber": zod.number().min(1),
+  "fullName": zod.string(),
+  "birthDate": zod.coerce.date(),
+  "gender": zod.enum(['M', 'F']),
+  "guardianName": zod.string(),
+  "guardianPhone": zod.string(),
+  "foodRestriction": zod.boolean().optional(),
+  "foodRestrictionDescription": zod.string().nullish(),
+  "autism": zod.boolean().optional(),
+  "observations": zod.string().nullish(),
+  "congregationId": zod.number().nullish(),
+  "congregationName": zod.string().nullish(),
+  "age": zod.number().optional(),
+  "presentToday": zod.boolean().optional(),
+  "createdAt": zod.coerce.date().optional()
+}).and(zod.object({
+  "deletedAt": zod.coerce.date(),
+  "deletionExpiresAt": zod.coerce.date(),
+  "deletedBy": zod.number().nullish(),
+  "deletedByName": zod.string().nullish()
+}))
+export const ListDeletedChildrenResponse = zod.array(ListDeletedChildrenResponseItem)
+
+
+/**
  * @summary Get children with birthdays this month
  */
+
+
+
 export const GetBirthdaysThisMonthResponseItem = zod.object({
   "id": zod.number(),
+  "childNumber": zod.number().min(1),
   "fullName": zod.string(),
   "birthDate": zod.coerce.date(),
   "gender": zod.enum(['M', 'F']),
@@ -236,6 +276,7 @@ export const GetMostAbsentChildrenQueryParams = zod.object({
 
 export const GetMostAbsentChildrenResponseItem = zod.object({
   "id": zod.number(),
+  "childNumber": zod.number(),
   "fullName": zod.string(),
   "birthDate": zod.coerce.date(),
   "gender": zod.enum(['M', 'F']),
@@ -264,8 +305,12 @@ export const GetChildParams = zod.object({
   "id": zod.coerce.number()
 })
 
+
+
+
 export const GetChildResponse = zod.object({
   "id": zod.number(),
+  "childNumber": zod.number().min(1),
   "fullName": zod.string(),
   "birthDate": zod.coerce.date(),
   "gender": zod.enum(['M', 'F']),
@@ -306,8 +351,12 @@ export const UpdateChildBody = zod.object({
   "congregationId": zod.number().optional()
 })
 
+
+
+
 export const UpdateChildResponse = zod.object({
   "id": zod.number(),
+  "childNumber": zod.number().min(1),
   "fullName": zod.string(),
   "birthDate": zod.coerce.date(),
   "gender": zod.enum(['M', 'F']),
@@ -330,6 +379,36 @@ export const UpdateChildResponse = zod.object({
  */
 export const DeleteChildParams = zod.object({
   "id": zod.coerce.number()
+})
+
+
+/**
+ * @summary Restore a deleted child
+ */
+export const RestoreChildParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+export const RestoreChildResponse = zod.object({
+  "id": zod.number(),
+  "childNumber": zod.number().min(1),
+  "fullName": zod.string(),
+  "birthDate": zod.coerce.date(),
+  "gender": zod.enum(['M', 'F']),
+  "guardianName": zod.string(),
+  "guardianPhone": zod.string(),
+  "foodRestriction": zod.boolean().optional(),
+  "foodRestrictionDescription": zod.string().nullish(),
+  "autism": zod.boolean().optional(),
+  "observations": zod.string().nullish(),
+  "congregationId": zod.number().nullish(),
+  "congregationName": zod.string().nullish(),
+  "age": zod.number().optional(),
+  "presentToday": zod.boolean().optional(),
+  "createdAt": zod.coerce.date().optional()
 })
 
 
@@ -372,6 +451,9 @@ export const ListAttendanceQueryParams = zod.object({
   "date": zod.date().optional().describe('Filter by date (YYYY-MM-DD)')
 })
 
+
+
+
 export const ListAttendanceResponseItem = zod.object({
   "id": zod.number(),
   "childId": zod.number(),
@@ -379,6 +461,7 @@ export const ListAttendanceResponseItem = zod.object({
   "attendanceTime": zod.string(),
   "child": zod.object({
   "id": zod.number(),
+  "childNumber": zod.number().min(1),
   "fullName": zod.string(),
   "birthDate": zod.coerce.date(),
   "gender": zod.enum(['M', 'F']),
