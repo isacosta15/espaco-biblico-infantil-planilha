@@ -5,7 +5,7 @@ import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 import { VitePWA } from "vite-plugin-pwa";
 
-const rawPort = process.env.PORT;
+const rawPort = process.env.PORT ?? "5000";
 
 if (!rawPort) {
   throw new Error(
@@ -19,7 +19,7 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-const basePath = process.env.BASE_PATH;
+const basePath = process.env.BASE_PATH ?? "/";
 
 if (!basePath) {
   throw new Error(
@@ -40,7 +40,8 @@ export default defineConfig({
       manifest: {
         name: "Espaço Bíblico Infantil",
         short_name: "EBI",
-        description: "Controle de presença e cadastro do departamento infantil",
+        description:
+          "Controle de presença e cadastro do departamento infantil",
         theme_color: "#2B7BB9",
         background_color: "#f6f8fa",
         display: "standalone",
@@ -101,7 +102,12 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),
-      "@assets": path.resolve(import.meta.dirname, "..", "..", "attached_assets"),
+      "@assets": path.resolve(
+        import.meta.dirname,
+        "..",
+        "..",
+        "attached_assets",
+      ),
     },
     dedupe: ["react", "react-dom"],
   },
@@ -118,9 +124,6 @@ export default defineConfig({
     fs: {
       strict: true,
     },
-    // Only needed for local (non-Replit) runs: on Replit the shared reverse
-    // proxy already routes /api to the api-server service before Vite ever
-    // sees the request, so this proxy is inert there.
     ...(process.env.REPL_ID === undefined
       ? {
           proxy: {
