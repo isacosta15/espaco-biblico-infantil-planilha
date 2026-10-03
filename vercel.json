@@ -7,8 +7,7 @@
     },
     "backend": {
       "root": "artifacts/api-server/",
-      "framework": "express",
-      "entrypoint": "src/index.ts"
+      "framework": "express"
     }
   },
   "rewrites": [
