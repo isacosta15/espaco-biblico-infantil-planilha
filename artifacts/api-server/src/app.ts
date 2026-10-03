@@ -1,6 +1,5 @@
 import express, { type Express } from "express";
 import cors from "cors";
-import * as pinoHttp from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
